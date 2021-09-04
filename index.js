@@ -147,6 +147,26 @@ const ObjectId = mongodb.ObjectId;
     res.send("Pesonagem removido com sucsso");
   });
 
+//Middleware
+
+app.all("*", function (req, res){
+  res.status(404).send({message:"Endepoint was not found"});
+});
+
+app.use((error, req, res, next)=>{
+  res.status(error.status || 500).send({
+   error:{
+     status:error.status||500,
+     message:error.message ||"internal server error",
+
+  },
+
+
+  });
+});
+
+
+
   app.listen(port, () => {
     console.info(`App rodando em http://localhost:${port}`);
   });
