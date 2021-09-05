@@ -11,6 +11,8 @@ require("dotenv").config();
 const express = require("express");
 const mongodb = require("mongodb");
 const ObjectId = mongodb.ObjectId;
+require("express-async-errors");
+const home= require("./components/home/home");
 
 (async () => {
   const dbUser = process.env.DB_USER;
@@ -30,7 +32,10 @@ const ObjectId = mongodb.ObjectId;
     useUnifiedTopology: true,
   };
 
+  console.info("conectando ao MongoDB ATLAS")
+
   const client = await mongodb.MongoClient.connect(connectionString, options);
+  console.info("Conexao estabelecida com  MongoDB ATLAS")
 
   const db = client.db("blue_db");
   const personagens = db.collection("personagens");
@@ -55,6 +60,9 @@ const ObjectId = mongodb.ObjectId;
     next();
   });
 
+  //ROTAS: HOME, UPDATE, CREATE, DELETE, READ ALL AND READY BY ID
+  app.use("/home",home);
+
   app.get("/", (req, res) => {
     res.send({ info: "Olá, Projeto integrado  do Backend ao Front" });
   });
@@ -66,6 +74,12 @@ const ObjectId = mongodb.ObjectId;
   app.get("/personagens/:id", async (req, res) => {
     const id = req.params.id;
     const personagem = await getPersonagemById(id);
+    if (!personagem){
+      res
+            .status(404)
+            .send({error:"o personagem especificado nao foi encontrado"});
+              return;
+    }
     res.send(personagem);
   });
 
@@ -73,19 +87,21 @@ const ObjectId = mongodb.ObjectId;
     const objeto = req.body;
 
     if (!objeto || !objeto.nome || !objeto.imagemUrl) {
-      res.send(
-        "a requisicao nao esta valida, verifique se há campo de nome e imagemUrl"
-      );
+      res.status (400).send({
+        error:
+        "Personagem inválido, verifique se há os campos Nome e ImagemUrl",
+      });
       return;
     }
     const insertCount = await personagens.insertOne(objeto);
 
     console.log(result);
+
     if (result.acknowledge == false) {
       res.send("Ocorreu um erro");
       return;
     }
-    res.send(objeto);
+    res.status(201).send(objeto);
   });
 
   app.put("/personagens/:id", async (req, res) => {
@@ -93,9 +109,12 @@ const ObjectId = mongodb.ObjectId;
     const objeto = req.body;
 
     if (!objeto || !objeto.nome || !objeto.imagemUrl) {
-      res.send(
-        "a requisicao nao esta valida, verifique se há campo de nome e imagemUrl"
-      );
+      res.status(400);
+      send({
+        error:
+        "Requisicao inválida, verifique se há campo de nome e imagemUrl"
+      });
+        
       return;
     }
     const quantidadePersonagens = await personagens.countDocuments({
@@ -116,8 +135,10 @@ const ObjectId = mongodb.ObjectId;
       }
     );
 
-    if (result.modifiedCount !== 1) {
-      res.send("Ocorreu um erro ao tentar atualizar o personagem");
+    if (result.acknowledged=="undefined") {
+      res
+         .status(500)
+         .send({error:"Ocorreu um erro ao tentar atualizar o personagem"});
       return;
     }
     res.send(await getPersonagemById(id));
@@ -131,7 +152,7 @@ const ObjectId = mongodb.ObjectId;
 	
 
     if (quantidadePersonagens !== 1) {
-      res.send("personagem nao foi encontrado");
+      res.status (404).send({ error:"personagem nao foi encontrado"});
       return;
     }
 
@@ -141,10 +162,12 @@ const ObjectId = mongodb.ObjectId;
     // caso ocorra um erro e o personagem nao seja removido///
 
     if (result.deletedCount !== 1) {
-      res.send("Ocorreu um erro ao tentar deletar o personagem");
+      res
+           .status(500)
+           .send({ error:"Ocorreu um erro ao tentar deletar o personagem"});
       return;
     }
-    res.send("Pesonagem removido com sucsso");
+    res.send(204);
   });
 
 //Middleware
@@ -152,6 +175,8 @@ const ObjectId = mongodb.ObjectId;
 app.all("*", function (req, res){
   res.status(404).send({message:"Endepoint was not found"});
 });
+
+//Middleware e erros//
 
 app.use((error, req, res, next)=>{
   res.status(error.status || 500).send({
@@ -165,9 +190,8 @@ app.use((error, req, res, next)=>{
   });
 });
 
-
-
   app.listen(port, () => {
     console.info(`App rodando em http://localhost:${port}`);
   });
+
 })();
