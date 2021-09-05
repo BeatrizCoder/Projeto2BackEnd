@@ -63,7 +63,7 @@ const home= require("./components/home/home");
   });
 
   //ROTAS: HOME, UPDATE, CREATE, DELETE, READ ALL AND READY BY ID
-  app.use("/home",home);
+  //app.use("/home",home);//
 
   app.get("/", (req, res) => {
     res.send({ info: "Olá, Projeto integrado  do Backend ao Front" });
