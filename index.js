@@ -146,7 +146,7 @@ const home= require("./components/home/home");
     res.send(await getPersonagemById(id));
   });
 
-  app.delete("/personagens/:id", async (req, res) => {
+  app.delete("/personagens/delete/:id", async (req, res) => {
     const id = req.params.id;
     const quantidadePersonagens = await personagens.countDocuments({
       _id: ObjectId(id),
