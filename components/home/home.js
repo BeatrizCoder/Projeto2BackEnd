@@ -1,5 +1,5 @@
 const express= require('express');
-const route=express.router();
+const router=express.router();
 
 router.use(function timelog(req, res, next){
     next();

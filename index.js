@@ -7,6 +7,8 @@
 //abrir terminal npm i
 //npm i e audit fix por yes
 
+//npm install express-async-errors --save//
+
 require("dotenv").config();
 const express = require("express");
 const mongodb = require("mongodb");
