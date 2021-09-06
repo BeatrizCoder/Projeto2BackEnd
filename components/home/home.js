@@ -1,12 +1,12 @@
-const express= require('express');
-const router=express.Router();
+const express = require("express");
+const router = express.Router();
 
-router.use(function timelog(req, res, next){
-    next();
+router.use(function timelog(req, res, next) {
+  next();
 });
 
-router.get("/",async (req, res)=>{
-    res.send({info:"Olá projeto 2 que vale nota"});
+router.get("/", async (req, res) => {
+  res.send({ info: "Olá projeto 2 que vale nota" });
 });
 
-module.exports=router
+module.exports = router;
