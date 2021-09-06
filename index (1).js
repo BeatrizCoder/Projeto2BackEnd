@@ -14,7 +14,7 @@ const express = require("express");
 const mongodb = require("mongodb");
 const ObjectId = mongodb.ObjectId;
 require("express-async-errors");
-const home = require("./components/home/home");
+const home = require("./components/home/home")
 
 (async () => {
 	const dbUser = process.env.DB_USER;
