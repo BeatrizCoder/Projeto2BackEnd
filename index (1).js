@@ -14,7 +14,8 @@ const express = require("express");
 const mongodb = require("mongodb");
 const ObjectId = mongodb.ObjectId;
 require("express-async-errors");
-const home = require("./components/home/home")
+var cors=require("cors");
+const home = require("./components/home/home");
 
 (async () => {
 	const dbUser = process.env.DB_USER;
@@ -47,28 +48,33 @@ const home = require("./components/home/home")
 	const getPersonagemById = async (id) =>
 		personagens.findOne({ _id: ObjectId(id) });
 
+	
+
 	//CORS É MT IMPORTANTE REVISE BIA!//
 
-	app.all("/*", (req, res, next) => {
-		res.header("Access-Control-Allow-Origin", "*");
+	// app.all("/*", (req, res, next) => {
+	// 	res.header("Access-Control-Allow-Origin", "*");
 
-		res.header("Access-Control-Allow-Methods", "*");
+	// 	res.header("Access-Control-Allow-Methods", "*");
 
-		res.header(
-			"Access-Control-Allow-Headers",
-			"Access-Control-Allow-Headers, Origin, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers, Authorization"
-		);
+	// 	res.header(
+	// 		"Access-Control-Allow-Headers",
+	// 		"Access-Control-Allow-Headers, Origin, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers, Authorization"
+	// 	);
 
-		next();
-	});
+	// 	next();//
+	// });
+
+//NOVO CORS//
+app.use(cors());
+app.options("*", cors());
 
 	//ROTAS: HOME, UPDATE, CREATE, DELETE, READ ALL AND READY BY ID
 	app.use("/home", home); //
 
 	// app.get("/", (req, res) => {
 	//   res.send({ info: "Olá, Projeto integrado  do Backend ao Front" });
-	// });
-
+	// });//
 	app.get("/personagens", async (req, res) => {
 		res.send(await getPersonagensValidas());
 	});
