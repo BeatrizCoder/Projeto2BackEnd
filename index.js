@@ -95,8 +95,9 @@ app.options("*", cors());
 	
 	app.use("/home", home);
 	app.use("/personagens/read-by-id", readById);
-	app.use("/personagem/read-all", readall);
+	app.use("/personagens/read-all", readall);
 	app.use("/personagens/update", update);
+	app.use("/personagens/update", create);
 
 // OLD POST- NOVO CREATE
 	// app.post("/personagens", async (req, res) => {
