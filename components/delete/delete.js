@@ -9,18 +9,13 @@ const ObjectId = mongodb.ObjectId;
   const dbChar = process.env.DB_CHAR;
   const connectionString = `mongodb+srv://${dbUser}:${dbPassword}@cluster0.${dbChar}.mongodb.net/${dbName}?retryWrites=true&w=majority`;
   const options = {
-    useUnifiedTipology: true,
+    useUnifiedTopology: true,
   };
-  const client = await mongodb.MongoClient.connect(connnectionString, options);
+  const client = await mongodb.MongoClient.connect(connectionString, options);
   const db = client.db("blue_db");
   const personagens = db.collection("personagens");
 
-  router.use(function timelog(req, res, next) {
-    next();
-    console.log("Time: ", Date.now());
-  });
-
-  router.delete("/personagens/:id", async (req, res) => {
+  router.delete("/:id", async (req, res) => {
     const id = req.params.id;
     const quantidadePersonagens = await personagens.countDocuments({
       _id: ObjectId(id),

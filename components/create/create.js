@@ -9,18 +9,16 @@ const ObjectId = mongodb.ObjectId;
   const dbChar = process.env.DB_CHAR;
   const connectionString = `mongodb+srv://${dbUser}:${dbPassword}@cluster0.${dbChar}.mongodb.net/${dbName}?retryWrites=true&w=majority`;
   const options = {
-    useUnifiedTipology: true,
+    useUnifiedTopology: true,
   };
-  const client = await mongodb.MongoClient.connect(connnectionString, options);
+  const client = await mongodb.MongoClient.connect(connectionString, options);
   const db = client.db("blue_db");
   const personagens = db.collection("personagens");
-
-  router.use(function timelog(req, res, next) {
+  router.use((req, res, next) => {
     next();
-    console.log("Time: ", Date.now());
   });
 
-  router.post("/personagens", async (req, res) => {
+  router.post("/", async (req, res) => {
     const objeto = req.body;
 
     if (!objeto || !objeto.nome || !objeto.imagemUrl) {
@@ -30,9 +28,8 @@ const ObjectId = mongodb.ObjectId;
       });
       return;
     }
-    const insertCount = await personagens.insertOne(objeto);
+    const result = await personagens.insertOne(objeto);
 
-    console.log(result);
 
     if (result.acknowledge == false) {
       res.send("Ocorreu um erro");

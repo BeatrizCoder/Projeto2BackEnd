@@ -9,23 +9,20 @@ const ObjectId = mongodb.ObjectId;
   const dbChar = process.env.DB_CHAR;
   const connectionString = `mongodb+srv://${dbUser}:${dbPassword}@cluster0.${dbChar}.mongodb.net/${dbName}?retryWrites=true&w=majority`;
   const options = {
-    useUnifiedTipology: true,
+    useUnifiedTopology: true,
   };
-  const client = await mongodb.MongoClient.connect(connnectionString, options);
+  const client = await mongodb.MongoClient.connect(connectionString, options);
   const db = client.db("blue_db");
   const personagens = db.collection("personagens");
 
   const getPersonagemById = async (id) =>
-    personagens.findOne({ _id: Object(id) });
-
-  router.use(function timelog(req, res, next) {
+    personagens.findOne({ _id: ObjectId(id) });
+  router.use((req, res, next) => {
     next();
-    console.log("Time: ", Date.now());
   });
 
   router.get("/:id", async (req, res) => {
     const id = req.params.id;
-    console.log(id);
     const personagem = await getPersonagemById(id);
     if (!personagem) {
       res

@@ -11,205 +11,176 @@
 
 require("dotenv").config();
 const express = require("express");
-const mongodb = require("mongodb");
-const ObjectId = mongodb.ObjectId;
 require("express-async-errors");
-var cors=require("cors");
+var cors = require("cors");
 const home = require("./components/home/home");
-const readAll=require("./components/read-all/read-all");
-const readById=require("./components/read-by-id/read-by-id");
-const update= require("./components/update/update");
-const create=require("./components/create/create");
+const readAll = require("./components/read-all/read-all");
+const readById = require("./components/read-by-id/read-by-id");
+const update = require("./components/update/update");
+const create = require("./components/create/create");
+const del = require("./components/delete/delete");
 
+const app = express();
 
-(async () => {
-	const dbUser = process.env.DB_USER;
-	const dbPassword = process.env.DB_PASSWORD;
-	const dbName = process.env.DB_NAME;
-	const dbChar = process.env.DB_CHAR;
+app.use(express.json());
 
-	const app = express();
+const port = process.env.PORT || 3000;
 
-	app.use(express.json());
+// OLD CORS.
+//NOTE: É MT IMPORTANTE REVISE BIA!//
 
-	const port = process.env.PORT || 3000;
+// app.all("/*", (req, res, next) => {
+// 	res.header("Access-Control-Allow-Origin", "*");
 
-	const connectionString = `mongodb+srv://${dbUser}:${dbPassword}@cluster0.${dbChar}.mongodb.net/${dbName}?retryWrites=true&w=majority`;
+// 	res.header("Access-Control-Allow-Methods", "*");
 
-	const options = {
-		useUnifiedTopology: true,
-	};
+// 	res.header(
+// 		"Access-Control-Allow-Headers",
+// 		"Access-Control-Allow-Headers, Origin, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers, Authorization"
+// 	);
 
-	console.info("conectando ao MongoDB ATLAS");
-
-	const client = await mongodb.MongoClient.connect(connectionString, options);
-	console.info("Conexao estabelecida com  MongoDB ATLAS");
-
-	const db = client.db("blue_db");
-	const personagens = db.collection("personagens");
-
-	const getPersonagensValidas = () => personagens.find({}).toArray();
-
-	const getPersonagemById = async (id) =>
-		personagens.findOne({ _id: ObjectId(id) });
-
-
-	// OLD CORS.
-	//NOTE: É MT IMPORTANTE REVISE BIA!//
-
-	// app.all("/*", (req, res, next) => {
-	// 	res.header("Access-Control-Allow-Origin", "*");
-
-	// 	res.header("Access-Control-Allow-Methods", "*");
-
-	// 	res.header(
-	// 		"Access-Control-Allow-Headers",
-	// 		"Access-Control-Allow-Headers, Origin, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers, Authorization"
-	// 	);
-
-	// 	next();//
-	// });
+// 	next();//
+// });
 
 //NOVO CORS//
 app.use(cors());
 app.options("*", cors());
 
-
-	// app.get("/", (req, res) => {
-	//   res.send({ info: "Olá, Projeto integrado  do Backend ao Front" });
-	// });//
-	// app.get("/personagens", async (req, res) => {
-	// 	res.send(await getPersonagensValidas());
-	// });
+// app.get("/", (req, res) => {
+//   res.send({ info: "Olá, Projeto integrado  do Backend ao Front" });
+// });//
+// app.get("/personagens", async (req, res) => {
+// 	res.send(await getPersonagensValidas());
+// });
 
 //OLD GET BY ID //
-	// app.get("/personagens/:id", async (req, res) => {
-	// 	const id = req.params.id;
-	// 	const personagem = await getPersonagemById(id);
-	// 	if (!personagem) {
-	// 		res
-	// 			.status(404)
-	// 			.send({ error: "o personagem especificado nao foi encontrado" });
-	// 		return;
-	// 	}
-	// 	res.send(personagem);
-	// });
+// app.get("/personagens/:id", async (req, res) => {
+// 	const id = req.params.id;
+// 	const personagem = await getPersonagemById(id);
+// 	if (!personagem) {
+// 		res
+// 			.status(404)
+// 			.send({ error: "o personagem especificado nao foi encontrado" });
+// 		return;
+// 	}
+// 	res.send(personagem);
+// });
 
-	//NEW ROTA POR PASTINHAS -ROTAS: HOME, UPDATE, CREATE, DELETE, READ ALL AND READY BY ID
-	
-	app.use("/home", home);
-	app.use("/personagens/read-all", readAll);
-	app.use("/personagens/read-by-id/", readById);
-	app.use("/personagens/update", update);
-	app.use("/personagens/create", create);
+//NEW ROTA POR PASTINHAS -ROTAS: HOME, UPDATE, CREATE, DELETE, READ ALL AND READY BY ID
+
+app.use("/home", home);
+app.use("/personagens/read-all", readAll);
+app.use("/personagens/read-by-id", readById);
+app.use("/personagens/update", update);
+app.use("/personagens/create", create);
+app.use("/personagens/delete", del);
 
 // OLD POST- NOVO CREATE
-	// app.post("/personagens", async (req, res) => {
-	// 	const objeto = req.body;
+// app.post("/personagens", async (req, res) => {
+// 	const objeto = req.body;
 
-	// 	if (!objeto || !objeto.nome || !objeto.imagemUrl) {
-	// 		res.status(400).send({
-	// 			error:
-	// 				"Personagem inválido, verifique se há os campos Nome e ImagemUrl",
-	// 		});
-	// 		return;
-	// 	}
-	// 	const insertCount = await personagens.insertOne(objeto);
+// 	if (!objeto || !objeto.nome || !objeto.imagemUrl) {
+// 		res.status(400).send({
+// 			error:
+// 				"Personagem inválido, verifique se há os campos Nome e ImagemUrl",
+// 		});
+// 		return;
+// 	}
+// 	const insertCount = await personagens.insertOne(objeto);
 
-	// 	console.log(result);
+// 	console.log(result);
 
-	// 	if (result.acknowledge == false) {
-	// 		res.send("Ocorreu um erro");
-	// 		return;
-	// 	}
-	// 	res.status(201).send(objeto);
-	// });
+// 	if (result.acknowledge == false) {
+// 		res.send("Ocorreu um erro");
+// 		return;
+// 	}
+// 	res.status(201).send(objeto);
+// });
 
 // OLD PUT //
-	// app.put("/personagens/:id", async (req, res) => {
-	// 	const id = req.params.id;
-	// 	const objeto = req.body;
+// app.put("/personagens/:id", async (req, res) => {
+// 	const id = req.params.id;
+// 	const objeto = req.body;
 
-	// 	if (!objeto || !objeto.nome || !objeto.imagemUrl) {
-	// 		res.status(400);
-	// 		send({
-	// 			error: "Requisicao inválida, verifique se há campo de nome e imagemUrl",
-	// 		});
+// 	if (!objeto || !objeto.nome || !objeto.imagemUrl) {
+// 		res.status(400);
+// 		send({
+// 			error: "Requisicao inválida, verifique se há campo de nome e imagemUrl",
+// 		});
 
-	// 		return;
-	// 	}
-	// 	const quantidadePersonagens = await personagens.countDocuments({
-	// 		_id: ObjectId(id),
-	// 	});
+// 		return;
+// 	}
+// 	const quantidadePersonagens = await personagens.countDocuments({
+// 		_id: ObjectId(id),
+// 	});
 
-	// 	if (quantidadePersonagens !== 1) {
-	// 		res.send("Personagem nao encontrado");
-	// 		return;
-	// 	}
+// 	if (quantidadePersonagens !== 1) {
+// 		res.send("Personagem nao encontrado");
+// 		return;
+// 	}
 
-	// 	const result = await personagens.updateOne(
-	// 		{
-	// 			_id: ObjectId(id),
-	// 		},
-	// 		{
-	// 			$set: objeto,
-	// 		}
-	// 	);
+// 	const result = await personagens.updateOne(
+// 		{
+// 			_id: ObjectId(id),
+// 		},
+// 		{
+// 			$set: objeto,
+// 		}
+// 	);
 
-	// 	if (result.acknowledged == "undefined") {
-	// 		res
-	// 			.status(500)
-	// 			.send({ error: "Ocorreu um erro ao tentar atualizar o personagem" });
-	// 		return;
-	// 	}
-	// 	res.send(await getPersonagemById(id));
-	// });
+// 	if (result.acknowledged == "undefined") {
+// 		res
+// 			.status(500)
+// 			.send({ error: "Ocorreu um erro ao tentar atualizar o personagem" });
+// 		return;
+// 	}
+// 	res.send(await getPersonagemById(id));
+// });
 
-	//OLD DELETE//- manter para  referencia de estudos
+//OLD DELETE//- manter para  referencia de estudos
 
-	// app.delete("/personagens/:id", async (req, res) => {
-	// 	const id = req.params.id;
-	// 	const quantidadePersonagens = await personagens.countDocuments({
-	// 		_id: ObjectId(id),
-	// 	});
+// app.delete("/personagens/:id", async (req, res) => {
+// 	const id = req.params.id;
+// 	const quantidadePersonagens = await personagens.countDocuments({
+// 		_id: ObjectId(id),
+// 	});
 
-	// 	if (quantidadePersonagens !== 1) {
-	// 		res.status(404).send({ error: "personagem nao foi encontrado" });
-	// 		return;
-	// 	}
+// 	if (quantidadePersonagens !== 1) {
+// 		res.status(404).send({ error: "personagem nao foi encontrado" });
+// 		return;
+// 	}
 
-	// 	const result = await personagens.deleteOne({
-	// 		_id: ObjectId(id),
-	// 	});
-	// 	// caso ocorra um erro e o personagem nao seja removido///
+// 	const result = await personagens.deleteOne({
+// 		_id: ObjectId(id),
+// 	});
+// 	// caso ocorra um erro e o personagem nao seja removido///
 
-	// 	if (result.deletedCount !== 1) {
-	// 		res
-	// 			.status(500)
-	// 			.send({ error: "Ocorreu um erro ao tentar deletar o personagem" });
-	// 		return;
-	// 	}
-	// 	res.send(204);
-	// });
+// 	if (result.deletedCount !== 1) {
+// 		res
+// 			.status(500)
+// 			.send({ error: "Ocorreu um erro ao tentar deletar o personagem" });
+// 		return;
+// 	}
+// 	res.send(204);
+// });
 
-	//Middleware
+//Middleware
 
-	 app.all("*", function (req, res) {
-	 	res.status(404).send({ message: "Endepoint was not found" });
-	 });
+app.all("*", function (req, res) {
+  res.status(404).send({ message: "Endpoint was not found" });
+});
 
-	//Middleware e erros//
+//Middleware e erros//
 
-	app.use((error, req, res, next) => {
-		res.status(error.status || 500).send({
-			error: {
-				status: error.status || 500,
-				message: error.message || "internal server error",
-			},
-		});
-	});
+app.use((error, req, res, next) => {
+  res.status(error.status || 500).send({
+    error: {
+      status: error.status || 500,
+      message: error.message || "internal server error",
+    },
+  });
+});
 
-	app.listen(port, () => {
-		console.info(`App rodando em http://localhost:${port}/home`);
-	});
-})();
+app.listen(port, () => {
+  console.info(`App rodando em http://localhost:${port}/home`);
+});
