@@ -50,7 +50,8 @@ const home = require("./components/home/home");
 
 	
 
-	//CORS É MT IMPORTANTE REVISE BIA!//
+	// OLD CORS.
+	//NOTE: É MT IMPORTANTE REVISE BIA!//
 
 	// app.all("/*", (req, res, next) => {
 	// 	res.header("Access-Control-Allow-Origin", "*");
@@ -69,112 +70,122 @@ const home = require("./components/home/home");
 app.use(cors());
 app.options("*", cors());
 
-	//ROTAS: HOME, UPDATE, CREATE, DELETE, READ ALL AND READY BY ID
-	app.use("/home", home); //
 
 	// app.get("/", (req, res) => {
 	//   res.send({ info: "Olá, Projeto integrado  do Backend ao Front" });
 	// });//
-	app.get("/personagens", async (req, res) => {
-		res.send(await getPersonagensValidas());
-	});
+	// app.get("/personagens", async (req, res) => {
+	// 	res.send(await getPersonagensValidas());
+	// });
 
-	app.get("/personagens/:id", async (req, res) => {
-		const id = req.params.id;
-		const personagem = await getPersonagemById(id);
-		if (!personagem) {
-			res
-				.status(404)
-				.send({ error: "o personagem especificado nao foi encontrado" });
-			return;
-		}
-		res.send(personagem);
-	});
+//OLD GET BY ID //
+	// app.get("/personagens/:id", async (req, res) => {
+	// 	const id = req.params.id;
+	// 	const personagem = await getPersonagemById(id);
+	// 	if (!personagem) {
+	// 		res
+	// 			.status(404)
+	// 			.send({ error: "o personagem especificado nao foi encontrado" });
+	// 		return;
+	// 	}
+	// 	res.send(personagem);
+	// });
 
-	app.post("/personagens", async (req, res) => {
-		const objeto = req.body;
+	//NEW ROTA POR PASTINHAS -ROTAS: HOME, UPDATE, CREATE, DELETE, READ ALL AND READY BY ID
+	
+	app.use("/home", home);
+	app.use("/personagens/read-by-id", readById);
+	app.use("/personagem/read-all", readall);
+	app.use("/personagens/update", update);
 
-		if (!objeto || !objeto.nome || !objeto.imagemUrl) {
-			res.status(400).send({
-				error:
-					"Personagem inválido, verifique se há os campos Nome e ImagemUrl",
-			});
-			return;
-		}
-		const insertCount = await personagens.insertOne(objeto);
+// OLD POST- NOVO CREATE
+	// app.post("/personagens", async (req, res) => {
+	// 	const objeto = req.body;
 
-		console.log(result);
+	// 	if (!objeto || !objeto.nome || !objeto.imagemUrl) {
+	// 		res.status(400).send({
+	// 			error:
+	// 				"Personagem inválido, verifique se há os campos Nome e ImagemUrl",
+	// 		});
+	// 		return;
+	// 	}
+	// 	const insertCount = await personagens.insertOne(objeto);
 
-		if (result.acknowledge == false) {
-			res.send("Ocorreu um erro");
-			return;
-		}
-		res.status(201).send(objeto);
-	});
+	// 	console.log(result);
 
-	app.put("/personagens/:id", async (req, res) => {
-		const id = req.params.id;
-		const objeto = req.body;
+	// 	if (result.acknowledge == false) {
+	// 		res.send("Ocorreu um erro");
+	// 		return;
+	// 	}
+	// 	res.status(201).send(objeto);
+	// });
 
-		if (!objeto || !objeto.nome || !objeto.imagemUrl) {
-			res.status(400);
-			send({
-				error: "Requisicao inválida, verifique se há campo de nome e imagemUrl",
-			});
+// OLD PUT //
+	// app.put("/personagens/:id", async (req, res) => {
+	// 	const id = req.params.id;
+	// 	const objeto = req.body;
 
-			return;
-		}
-		const quantidadePersonagens = await personagens.countDocuments({
-			_id: ObjectId(id),
-		});
+	// 	if (!objeto || !objeto.nome || !objeto.imagemUrl) {
+	// 		res.status(400);
+	// 		send({
+	// 			error: "Requisicao inválida, verifique se há campo de nome e imagemUrl",
+	// 		});
 
-		if (quantidadePersonagens !== 1) {
-			res.send("Personagem nao encontrado");
-			return;
-		}
+	// 		return;
+	// 	}
+	// 	const quantidadePersonagens = await personagens.countDocuments({
+	// 		_id: ObjectId(id),
+	// 	});
 
-		const result = await personagens.updateOne(
-			{
-				_id: ObjectId(id),
-			},
-			{
-				$set: objeto,
-			}
-		);
+	// 	if (quantidadePersonagens !== 1) {
+	// 		res.send("Personagem nao encontrado");
+	// 		return;
+	// 	}
 
-		if (result.acknowledged == "undefined") {
-			res
-				.status(500)
-				.send({ error: "Ocorreu um erro ao tentar atualizar o personagem" });
-			return;
-		}
-		res.send(await getPersonagemById(id));
-	});
+	// 	const result = await personagens.updateOne(
+	// 		{
+	// 			_id: ObjectId(id),
+	// 		},
+	// 		{
+	// 			$set: objeto,
+	// 		}
+	// 	);
 
-	app.delete("/personagens/:id", async (req, res) => {
-		const id = req.params.id;
-		const quantidadePersonagens = await personagens.countDocuments({
-			_id: ObjectId(id),
-		});
+	// 	if (result.acknowledged == "undefined") {
+	// 		res
+	// 			.status(500)
+	// 			.send({ error: "Ocorreu um erro ao tentar atualizar o personagem" });
+	// 		return;
+	// 	}
+	// 	res.send(await getPersonagemById(id));
+	// });
 
-		if (quantidadePersonagens !== 1) {
-			res.status(404).send({ error: "personagem nao foi encontrado" });
-			return;
-		}
+	//OLD DELETE//
 
-		const result = await personagens.deleteOne({
-			_id: ObjectId(id),
-		});
-		// caso ocorra um erro e o personagem nao seja removido///
+	// app.delete("/personagens/:id", async (req, res) => {
+	// 	const id = req.params.id;
+	// 	const quantidadePersonagens = await personagens.countDocuments({
+	// 		_id: ObjectId(id),
+	// 	});
 
-		if (result.deletedCount !== 1) {
-			res
-				.status(500)
-				.send({ error: "Ocorreu um erro ao tentar deletar o personagem" });
-			return;
-		}
-		res.send(204);
-	});
+	// 	if (quantidadePersonagens !== 1) {
+	// 		res.status(404).send({ error: "personagem nao foi encontrado" });
+	// 		return;
+	// 	}
+
+	// 	const result = await personagens.deleteOne({
+	// 		_id: ObjectId(id),
+	// 	});
+	// 	// caso ocorra um erro e o personagem nao seja removido///
+
+	// 	if (result.deletedCount !== 1) {
+	// 		res
+	// 			.status(500)
+	// 			.send({ error: "Ocorreu um erro ao tentar deletar o personagem" });
+	// 		return;
+	// 	}
+	// 	res.send(204);
+	// });
 
 	//Middleware
 
