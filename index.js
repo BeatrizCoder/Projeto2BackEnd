@@ -194,9 +194,9 @@ app.options("*", cors());
 
 	//Middleware
 
-	app.all("*", function (req, res) {
-		res.status(404).send({ message: "Endepoint was not found" });
-	});
+	 app.all("*", function (req, res) {
+	 	res.status(404).send({ message: "Endepoint was not found" });
+	 });
 
 	//Middleware e erros//
 

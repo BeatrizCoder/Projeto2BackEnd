@@ -20,8 +20,9 @@ const ObjectId = mongodb.ObjectId;
     console.log("Time: ", Date.now());
   });
 
-  router.get("/personagens", async (req, res) => {
+  router.get("/", async (req, res) => {
     res.send(await getPersonagensValidas());
+    
   });
 })();
 module.exports = router;
