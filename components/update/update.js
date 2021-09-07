@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const mongodb = require("mongod");
+const mongodb = require("mongodb");
 const ObjectId = mongodb.ObjectId;
 (async () => {
   const dbUser = process.env.DB_USER;

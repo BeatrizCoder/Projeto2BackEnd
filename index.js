@@ -16,6 +16,11 @@ const ObjectId = mongodb.ObjectId;
 require("express-async-errors");
 var cors=require("cors");
 const home = require("./components/home/home");
+const readAll=require("./components/read-all/read-all");
+const readById=require("./components/read-by-id/read-by-id");
+const update= require("./components/update/update");
+const create=require("./components/create/create");
+
 
 (async () => {
 	const dbUser = process.env.DB_USER;
@@ -48,7 +53,6 @@ const home = require("./components/home/home");
 	const getPersonagemById = async (id) =>
 		personagens.findOne({ _id: ObjectId(id) });
 
-	
 
 	// OLD CORS.
 	//NOTE: É MT IMPORTANTE REVISE BIA!//
@@ -94,10 +98,10 @@ app.options("*", cors());
 	//NEW ROTA POR PASTINHAS -ROTAS: HOME, UPDATE, CREATE, DELETE, READ ALL AND READY BY ID
 	
 	app.use("/home", home);
-	app.use("/personagens/read-by-id", readById);
-	app.use("/personagens/read-all", readall);
+	app.use("/personagens/read-all", readAll);
+	app.use("/personagens/read-by-id/", readById);
 	app.use("/personagens/update", update);
-	app.use("/personagens/update", create);
+	app.use("/personagens/create", create);
 
 // OLD POST- NOVO CREATE
 	// app.post("/personagens", async (req, res) => {
@@ -161,7 +165,7 @@ app.options("*", cors());
 	// 	res.send(await getPersonagemById(id));
 	// });
 
-	//OLD DELETE//
+	//OLD DELETE//- manter para  referencia de estudos
 
 	// app.delete("/personagens/:id", async (req, res) => {
 	// 	const id = req.params.id;
