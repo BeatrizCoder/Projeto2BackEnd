@@ -15,7 +15,7 @@ const ObjectId = mongodb.ObjectId;
   const db = client.db("blue_db");
   const personagens = db.collection("personagens");
   const getPersonagemById = async (id) =>
-  personagens.findOne({ _id: Object(id) });
+    personagens.findOne({ _id: Object(id) });
 
   router.put("/:id", async (req, res) => {
     const id = req.params.id;

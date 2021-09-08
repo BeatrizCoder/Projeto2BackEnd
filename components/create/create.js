@@ -30,7 +30,6 @@ const ObjectId = mongodb.ObjectId;
     }
     const result = await personagens.insertOne(objeto);
 
-
     if (result.acknowledge == false) {
       res.send("Ocorreu um erro");
       return;
